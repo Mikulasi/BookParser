@@ -25,8 +25,11 @@ public class TextParser {
         String text = "";
         try {
             FileInputStream inFile = new FileInputStream(path);
-            BufferedReader buff = new BufferedReader(new InputStreamReader(inFile));
-            text = new String(buff.readLine()); // String with all text
+            //BufferedReader buff = new BufferedReader(new InputStreamReader(inFile));
+            byte[] str = new byte[inFile.available()];
+            inFile.read(str);
+            text = new String(str);
+            //text = new String(buff.readLine()); // String with all text
         } catch (FileNotFoundException e) {
             LOGGER.error(e);
         } catch (IOException e) {
