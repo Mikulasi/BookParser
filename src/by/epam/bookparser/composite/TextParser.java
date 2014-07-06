@@ -42,13 +42,13 @@ public class TextParser {
         // parse to paragraph
         Text paragraphList = new Text();
         Pattern patternParagraph = Pattern
-                .compile("regex_paragraph_listing.properties");
+                .compile("(\\s*(.+))([^(\\s*(Start listing)([^\\t]+)(End listing)\\s)])|\\s*(Start listing)([^\\t]+)(End listing)");
         TextPart paragraphLeaf;
         String paragraph = "";
         Matcher matcher = patternParagraph.matcher(text);
         while (matcher.find()) {
             paragraph = matcher.group();
-            if (Pattern.matches("regex_listing.properties", paragraph)) {
+            if (Pattern.matches("\\s*(Start listing)([^\\t]+)(End listing)", paragraph)) {
                 // if listing - add to list without parsing
                 paragraphLeaf = new TextPart(paragraph);
                 LOGGER.info(paragraphLeaf);
@@ -66,7 +66,7 @@ public class TextParser {
     private Text parseToSentence(Text paragraphList, String paragraph) {
         // parse to sentence
         Text sentenceList = new Text();
-        Pattern patternSentence = Pattern.compile("regex_sentence.properties");
+        Pattern patternSentence = Pattern.compile("([^(\\\\.|!|\\\\?)]+)(\\\\.|!|\\\\?)");
         Matcher m2 = patternSentence.matcher(paragraph);
         String sentence = "";
         while (m2.find()) {
@@ -79,7 +79,7 @@ public class TextParser {
 
     private Text parseToWord(Text sentenceList, String sentence) {
         // parse to word
-        Pattern patternWord = Pattern.compile("regex_word.properties");
+        Pattern patternWord = Pattern.compile("([^(\\\\s)]*)(\\\\s)*");
         String word = "";
         Matcher matcher = patternWord.matcher(sentence);
         Text wordList = new Text();
@@ -93,7 +93,7 @@ public class TextParser {
 
     private Text parseToSignAndWord(Text wordList, String word) {
         // parse to sign and word
-        Pattern pattern = Pattern.compile("regex_word_sign.properties");
+        Pattern pattern = Pattern.compile("([\\\\.,!\\\\?:;@]{1})|([^\\\\.,!\\\\?:;@]*)");
         String wordSign = "";
         Matcher matcher = pattern.matcher(word);
         Text wordSignList = new Text();
@@ -107,7 +107,7 @@ public class TextParser {
 
     private Text parseToSymbol(Text wordSignList, String wordSign) {
         // parse to symbol
-        Pattern pattern = Pattern.compile("regex_symbol.properties");
+        Pattern pattern = Pattern.compile(".{1}");
         String symbol = "";
         Matcher matcher = pattern.matcher(wordSign);
         TextPart symbolList;
