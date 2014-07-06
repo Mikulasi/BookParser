@@ -66,7 +66,7 @@ public class TextParser {
     private Text parseToSentence(Text paragraphList, String paragraph) {
         // parse to sentence
         Text sentenceList = new Text();
-        Pattern patternSentence = Pattern.compile("([^(\\\\.|!|\\\\?)]+)(\\\\.|!|\\\\?)");
+        Pattern patternSentence = Pattern.compile("([^(\\.|!|\\?)]+)(\\.|!|\\?)");
         Matcher m2 = patternSentence.matcher(paragraph);
         String sentence = "";
         while (m2.find()) {
@@ -79,7 +79,7 @@ public class TextParser {
 
     private Text parseToWord(Text sentenceList, String sentence) {
         // parse to word
-        Pattern patternWord = Pattern.compile("([^(\\\\s)]*)(\\\\s)*");
+        Pattern patternWord = Pattern.compile("([^(\\s)]*)(\\s)*");
         String word = "";
         Matcher matcher = patternWord.matcher(sentence);
         Text wordList = new Text();
@@ -93,7 +93,7 @@ public class TextParser {
 
     private Text parseToSignAndWord(Text wordList, String word) {
         // parse to sign and word
-        Pattern pattern = Pattern.compile("([\\\\.,!\\\\?:;@]{1})|([^\\\\.,!\\\\?:;@]*)");
+        Pattern pattern = Pattern.compile("([\\.,!\\?:;@]{1})|([^\\.,!\\?:;@]*)");
         String wordSign = "";
         Matcher matcher = pattern.matcher(word);
         Text wordSignList = new Text();
