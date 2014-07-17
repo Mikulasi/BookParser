@@ -1,0 +1,31 @@
+﻿Towards the end of last week I started thinking how to deal with large amounts of XML data in a resource-friendly way.
+The main problem that I wanted to solve was how to process large XML files in chunks while at the same time providing upstream/downstream systems with some data to process.
+Of course I’ve been using JAXB technology for few years now; the main advantage of using JAXB is the quick time-to-market;
+if one possesses an XML schema, there are tools out there to auto-generate the corresponding Java domain model classes automatically
+(Eclipse Indigo, Maven jaxb plugins in various sauces, ant tasks, to name a few). The JAXB API then offers a Marshaller and an Unmarshaller to write/read XML data, mapping the Java domain model.
+When thinking of JAXB as solution for my problem I suddendlly realised that JAXB keeps the whole objectification of the XML schema in memory, so the obvious question was:
+“How would our infrastructure cope with large XML files (e.g. in my case with a number of elements > 100,000) if we were to use JAXB?”.
+I could have simply produced a large XML file, then a client for it and find out about memory consumption.
+As one probably knows there are mainly two approaches to processing XML data in Java: DOM and SAX.
+With DOM, the XML document is represented into memory as a tree; DOM is useful if one needs cherry-pick access to the tree nodes or if one needs to write brief XML documents.
+On the other side of the spectrum there is SAX, an event-driven technology, where the whole document is parsed one XML element at the time, and for each XML significative event,
+callbacks are “pushed” to a Java client which then deals with them (such as START_DOCUMENT, START_ELEMENT, END_ELEMENT, etc).
+Since SAX does not bring the whole document into memory but it applies a cursor like approach to XML processing it does not consume huge amounts of memory.
+The drawback with SAX is that it processes the whole document start to finish; this might not be necessarily what one wants for large XML documents.
+In my scenario, for instance, I’d like to be able to pass to downstream systems XML elements as they are available, but at the same time maybe
+I’d like to pass only 100 elements at the time, implementing some sort of pagination solution. DOM seems too demanding from a memory-consumption point of view,
+whereas SAX seems to coarse-grained for my needs.
+I remembered reading something about STax, a Java technology which offered a middle ground between the capability to pull XML elements
+(as opposed to pushing XML elements, e.g. SAX) while being RAM-friendly. I then looked into the technology and decided that STax was probably the compromise I was looking for;
+ however I wanted to keep the easy programming model offered by JAXB, so I really needed a combination of the two.
+ While investigating STax, I came across Woodstox; this open source project promises to be a faster XML parser than many othrers, so I decided to include it in my benchmark as well.
+ I now had all elements to create a benchmark to give me memory consumption and processing speed metrics when processing large XML documents.
+The benchmark plan
+In order to create a benchmark I needed to do the following:
+Create an XML schema which defined my domain model. This would be the input for JAXB to create the Java domain model
+Create three large XML files representing the model, with 10,000 / 100,000 / 1,000,000 elements respectively
+Have a pure JAXB client which would unmarshall the large XML files completely in memory
+Have a STax/JAXB client which would combine the low-memory consumption of SAX technologies with the ease of programming model offered by JAXB
+Have a Woodstox/JAXB client with the same characteristics of the STax/JAXB client (in few words I just wanted to change the underlying parser and see if I could obtain any performance boost)
+Record both memory consumption and speed of processing (e.g. how quickly would each solution make XML chunks available in memory as JAXB domain model classes)
+Make the results available graphically, since, as we know, one picture tells one thousands words.
